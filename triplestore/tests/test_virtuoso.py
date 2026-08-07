@@ -161,6 +161,91 @@ def test_load_from_turtle_file():
     assert any(SUBJECT in b and PREDICATE in b and OBJECT in b for b in bindings)
 
 
+def test_load_twice():
+    """Test that loading the same triples twice does not create duplicates."""
+    turtle_data = "\n".join(
+        f"<http://example.org/s{i}> <http://example.org/p> <http://example.org/o{i}> ."
+        for i in range(10)
+    )
+
+    with tempfile.NamedTemporaryFile(delete=False, mode="w", suffix=".ttl", encoding="utf-8") as f:
+        f.write(turtle_data)
+        tmp_path = f.name
+
+    try:
+        store = Triplestore("virtuoso", config=config)
+        store.clear()
+
+        store.load(tmp_path)
+        first_results = store.query(SPARQL_QUERY)
+
+        assert len(first_results) == 10
+
+        store.load(tmp_path)
+        second_results = store.query(SPARQL_QUERY)
+
+        assert len(second_results) == 10
+
+        assert {
+            (r["s"], r["p"], r["o"])
+            for r in first_results
+        } == {
+            (r["s"], r["p"], r["o"])
+            for r in second_results
+        }
+
+    finally:
+        Path(tmp_path).unlink()
+
+
+def test_load_overlapping_data():
+    """Test that overlapping RDF files only add new triples."""
+    turtle_data_1 = """
+        <http://example.org/s1> <http://example.org/p> <http://example.org/o1> .
+        <http://example.org/s2> <http://example.org/p> <http://example.org/o2> .
+        <http://example.org/s3> <http://example.org/p> <http://example.org/o3> .
+    """
+
+    turtle_data_2 = """
+        <http://example.org/s2> <http://example.org/p> <http://example.org/o2> .
+        <http://example.org/s3> <http://example.org/p> <http://example.org/o3> .
+        <http://example.org/s4> <http://example.org/p> <http://example.org/o4> .
+    """
+
+    with tempfile.NamedTemporaryFile(delete=False, mode="w", suffix=".ttl", encoding="utf-8") as f1:
+        f1.write(turtle_data_1)
+        path1 = f1.name
+
+    with tempfile.NamedTemporaryFile(delete=False, mode="w", suffix=".ttl", encoding="utf-8") as f2:
+        f2.write(turtle_data_2)
+        path2 = f2.name
+
+    try:
+        store = Triplestore("virtuoso", config=config)
+        store.clear()
+
+        store.load(path1)
+        assert len(store.query(SPARQL_QUERY)) == 3
+
+        store.load(path2)
+        results = store.query(SPARQL_QUERY)
+
+        assert len(results) == 4
+
+        subjects = {r["s"] for r in results}
+
+        assert subjects == {
+            "http://example.org/s1",
+            "http://example.org/s2",
+            "http://example.org/s3",
+            "http://example.org/s4",
+        }
+
+    finally:
+        Path(path1).unlink()
+        Path(path2).unlink()
+
+
 def test_load_from_ntriples_file():
     """Test loading triples from a .nt file into the store."""
     ntriples_data = "<http://example.org/s> <http://example.org/p> <http://example.org/o> ."
