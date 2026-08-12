@@ -5,6 +5,7 @@
 import gzip
 import shutil
 import tempfile
+from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
@@ -103,7 +104,7 @@ class Jena(TriplestoreBackend):
         if not path.exists():
             msg = f"[APACHE JENA] File not found: {filename}"
             raise FileNotFoundError(msg)
-        
+
         content_type = get_rdf_content_type(filename, backend_name="APACHE JENA")
 
         params = {"graph": self._effective_graph}
@@ -153,6 +154,43 @@ class Jena(TriplestoreBackend):
         sparql = (
             f"INSERT DATA {{ GRAPH <{self._effective_graph}> {{ {triple} }} }}"
         )
+        self._run_update(sparql)
+
+    def add_all(self, triples: Iterable[tuple[Any, Any, Any]]) -> None:
+        """
+        Add multiple triples to the Jena store.
+
+        Parameters
+        ------
+        triples : Iterable[tuple[Any, Any, Any]]
+            An iterable of RDF triples. Each triple must contain exactly three values: subject, predicate, and object.
+
+            The subject must serialize to an RDF IRI or blank node.
+            The predicate must serialize to an RDF IRI.
+            The object may serialize to an RDF IRI, blank node, or literal.
+
+            RDFLib URIRef, BNode, and Literal values are also supported.
+        """
+        serialized_triples = []
+
+        for s, p, o in triples:
+            s_term = validate_rdf_term(s, "subject", "APACHE JENA")
+            p_term = validate_rdf_term(p, "predicate", "APACHE JENA")
+            o_term = validate_rdf_term(o, "object", "APACHE JENA")
+
+            serialized_triples.append(f"{s_term} {p_term} {o_term} .")
+
+        if not serialized_triples:
+            return
+
+        data = "\n".join(serialized_triples)
+
+        sparql = (
+            f"INSERT DATA {{ GRAPH <{self.graph_uri}> {{ {data} }} }}"
+            if self.graph_uri else
+            f"INSERT DATA {{ {data} }}"
+        )
+
         self._run_update(sparql)
 
     def delete(self, s: Any, p: Any, o: Any) -> None:
