@@ -457,6 +457,7 @@ class AllegroGraph(TriplestoreBackend):
 
             with ag_connect(self.repository, host=host, port=port, user=self.auth[0], password=self.auth[1], catalog=self.catalog,
                             create=True, clear=False) as conn:
+                conn.setDuplicateSuppressionPolicy("spog")
                 _ = conn.size()
         except Exception as e:
             msg = f"[AllegroGraph] Failed to ensure repository '{self.repository}' exists"
