@@ -2,11 +2,14 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
 from pathlib import Path
 from typing import Any
 
 from pyoxigraph import BlankNode, DefaultGraph, Literal, NamedNode, Quad, QueryBoolean, QueryTriples, RdfFormat, Store
+from rdflib import BNode as RDFLibBNode
+from rdflib import Literal as RDFLibLiteral
+from rdflib import URIRef as RDFLibURIRef
 
 from triplestore.base import TriplestoreBackend
 from triplestore.utils import (
@@ -19,7 +22,6 @@ from triplestore.utils import (
     validate_config,
     validate_rdf_term,
 )
-
 
 OXIGRAPH_RDF_FORMATS = {
     "text/turtle": RdfFormat.TURTLE,
@@ -80,7 +82,7 @@ class Oxigraph(TriplestoreBackend):
         if not path.exists():
             msg = f"[Oxigraph] File not found: {filename}"
             raise FileNotFoundError(msg)
-        
+
         content_type = get_rdf_content_type(filename, backend_name="Oxigraph")
         rdf_format = OXIGRAPH_RDF_FORMATS[content_type]
 
@@ -112,6 +114,32 @@ class Oxigraph(TriplestoreBackend):
             graph_term,
         )
         self.store.add(quad)
+
+    def add_all(self, triples: Iterable[tuple[Any, Any, Any]]) -> None:
+        """
+        Add multiple triples to the Oxigraph store.
+
+        Parameters
+        ----------
+        triples : Iterable[tuple[Any, Any, Any]]
+            An iterable of RDF triples. Each triple must contain exactly three values:
+            subject, predicate, and object.
+
+            The subject must serialize to an RDF IRI or blank node.
+            The predicate must serialize to an RDF IRI.
+            The object may serialize to an RDF IRI, blank node, or literal.
+        """
+        graph_term = NamedNode(self.graph_uri) if self.graph_uri else DefaultGraph()
+        quads = (
+            Quad(
+                _to_oxigraph_term(s, "subject", "Oxigraph"),
+                _to_oxigraph_term(p, "predicate", "Oxigraph"),
+                _to_oxigraph_term(o, "object", "Oxigraph"),
+                graph_term,
+            )
+            for s, p, o in triples
+        )
+        self.store.extend(quads)
 
     def delete(self, subject: Any, predicate: Any, obj: Any) -> None:
         """
@@ -323,6 +351,27 @@ def _to_oxigraph_term(term: Any, position: str, backend_name: str = "Oxigraph"):
         If any triple component is invalid for its RDF position or cannot be converted into a supported Oxigraph RDF term.
     """
     validate_rdf_term(term, position, backend_name)
+
+    # RDFLib URI
+    if isinstance(term, RDFLibURIRef):
+        return NamedNode(str(term))
+
+    # RDFLib blank node
+    if isinstance(term, RDFLibBNode):
+        return BlankNode(str(term))
+
+    # RDFLib literal
+    if isinstance(term, RDFLibLiteral):
+        if term.language is not None:
+            return Literal(str(term), language=term.language)
+
+        if term.datatype is not None:
+            return Literal(
+                str(term),
+                datatype=NamedNode(str(term.datatype)),
+            )
+
+        return Literal(str(term))
 
     # Blank node (allowed only for subject and object)
     if position in {"subject", "object"} and isinstance(term, str) and term.startswith("_:"):

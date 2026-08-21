@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import logging
+from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 
@@ -88,7 +89,7 @@ class Blazegraph(TriplestoreBackend):
         if not Path(filename).exists():
             msg = f"[Blazegraph] File not found: {filename}"
             raise FileNotFoundError(msg)
-        
+
         content_type = get_rdf_content_type(filename, backend_name="Blazegraph")
         headers = {"Content-Type": content_type}
 
@@ -121,6 +122,43 @@ class Blazegraph(TriplestoreBackend):
             if self.graph_uri else
             f"INSERT DATA {{ {triple} }}"
         )
+        self._run_update(sparql)
+
+    def add_all(self, triples: Iterable[tuple[Any, Any, Any]]) -> None:
+        """
+        Add multiple triples to the Blazegraph store.
+
+        Parameters
+        ------
+        triples : Iterable[tuple[Any, Any, Any]]
+            An iterable of RDF triples. Each triple must contain exactly three values: subject, predicate, and object.
+
+            The subject must serialize to an RDF IRI or blank node.
+            The predicate must serialize to an RDF IRI.
+            The object may serialize to an RDF IRI, blank node, or literal.
+
+            RDFLib URIRef, BNode, and Literal values are also supported.
+        """
+        serialized_triples = []
+
+        for s, p, o in triples:
+            s_term = validate_rdf_term(s, "subject", "Blazegraph")
+            p_term = validate_rdf_term(p, "predicate", "Blazegraph")
+            o_term = validate_rdf_term(o, "object", "Blazegraph")
+
+            serialized_triples.append(f"{s_term} {p_term} {o_term} .")
+
+        if not serialized_triples:
+            return
+
+        data = "\n".join(serialized_triples)
+
+        sparql = (
+            f"INSERT DATA {{ GRAPH <{self.graph_uri}> {{ {data} }} }}"
+            if self.graph_uri else
+            f"INSERT DATA {{ {data} }}"
+        )
+
         self._run_update(sparql)
 
     def delete(self, s: Any, p: Any, o: Any) -> None:

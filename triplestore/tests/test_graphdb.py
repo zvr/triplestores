@@ -16,6 +16,8 @@ from pathlib import Path
 
 import pytest
 import requests
+from rdflib import BNode, Graph, Literal, URIRef
+from rdflib.namespace import XSD
 from triplestore import Triplestore
 from triplestore.utils import detect_graphdb_url
 
@@ -77,6 +79,18 @@ def test_multiple_triples_query():
     assert "http://example.org/s1" in subjects
     assert "http://example.org/s2" in subjects
     assert len(subjects) == 2
+
+
+def test_add_twice():
+    store = Triplestore("graphdb", config=config)
+    store.clear()
+
+    store.add(SUBJECT, PREDICATE, OBJECT)
+    store.add(SUBJECT, PREDICATE, OBJECT)
+    results = store.query(SPARQL_QUERY)
+
+    assert len(results) == 1
+    assert results[0] == {"s": SUBJECT, "p": PREDICATE, "o": OBJECT}
 
 
 def test_delete_triple():
@@ -316,6 +330,232 @@ def test_load_rejects_unsupported_file_format():
         store.load(tmp_path)
 
     Path(tmp_path).unlink()
+
+
+def test_add_all():
+    """Test adding multiple triples to the store."""
+    triples = [(f"http://example.org/s{i}", "http://example.org/p", f"http://example.org/o{i}")for i in range(10)]
+
+    store = Triplestore("graphdb", config=config)
+    store.clear()
+    store.add_all(triples)
+
+    results = store.query(SPARQL_QUERY)
+    assert len(results) == 10
+
+    actual = {(row["s"], row["p"], row["o"]) for row in results}
+    expected = set(triples)
+    assert actual == expected
+
+
+def test_add_all_empty():
+    """Test that add_all() handles an empty iterable without adding data."""
+    store = Triplestore("graphdb", config=config)
+    store.clear()
+
+    store.add_all([])
+
+    results = store.query(SPARQL_QUERY)
+    assert len(results) == 0
+
+
+def test_add_all_generator():
+    """Test adding multiple triples from a generator."""
+    triples = ((f"http://example.org/s{i}", "http://example.org/p", f"http://example.org/o{i}") for i in range(10))
+
+    store = Triplestore("graphdb", config=config)
+    store.clear()
+
+    store.add_all(triples)
+
+    results = store.query(SPARQL_QUERY)
+    assert len(results) == 10
+
+
+def test_add_all_mixed_objects():
+    """Test adding triples with different supported RDF object types."""
+    triples = [
+        ("http://example.org/s1", "http://example.org/value", "hello"),
+        ("http://example.org/s2", "http://example.org/value", 42),
+        ("http://example.org/s3", "http://example.org/value", True),
+        ("http://example.org/s4", "http://example.org/value", {"value": "hello", "lang": "en"})
+    ]
+
+    store = Triplestore("graphdb", config=config)
+    store.clear()
+
+    store.add_all(triples)
+
+    results = store.query(SPARQL_QUERY)
+    assert len(results) == 4
+
+
+def test_add_all_duplicates():
+    """Test that adding duplicate triples does not create duplicate entries."""
+    triple = ("http://example.org/s", "http://example.org/p", "http://example.org/o")
+    triples = [triple, triple, triple]
+
+    store = Triplestore("graphdb", config=config)
+    store.clear()
+
+    store.add_all(triples)
+    store.add_all(triples)
+
+    results = store.query(SPARQL_QUERY)
+    assert len(results) == 1
+
+
+def test_add_all_invalid_predicate():
+    """Test that add_all() rejects triples with an invalid predicate."""
+    triples = [("http://example.org/s1", "not-an-iri", "value")]
+
+    store = Triplestore("graphdb", config=config)
+    store.clear()
+
+    with pytest.raises(ValueError):
+        store.add_all(triples)
+
+
+def test_add_all_rdflib_uriref():
+    """Test adding RDFLib URIRef values through add_all()."""
+    g = Graph()
+
+    subject = URIRef("http://example.org/alice")
+    predicate = URIRef("http://example.org/knows")
+    object_ = URIRef("http://example.org/bob")
+
+    g.add((subject, predicate, object_))
+
+    store = Triplestore("graphdb", config=config)
+    store.clear()
+
+    store.add_all(g)
+
+    results = store.query(SPARQL_QUERY)
+
+    assert len(results) == 1
+    assert results[0]["s"] == str(subject)
+    assert results[0]["p"] == str(predicate)
+    assert results[0]["o"] == str(object_)
+
+
+def test_add_all_rdflib_literal_language():
+    """Test adding an RDFLib language-tagged literal through add_all()."""
+    g = Graph()
+
+    subject = URIRef("http://example.org/s1")
+    predicate = URIRef("http://example.org/label")
+    object_ = Literal("hello", lang="en")
+
+    g.add((subject, predicate, object_))
+
+    store = Triplestore("graphdb", config=config)
+    store.clear()
+
+    store.add_all(g)
+
+    results = store.query(f"""
+        SELECT ?o (LANG(?o) AS ?lang)
+        WHERE {{
+            GRAPH <{config["graph"]}> {{
+                <http://example.org/s1>
+                <http://example.org/label>
+                ?o .
+            }}
+        }}
+    """)
+
+    assert len(results) == 1
+    assert results[0]["o"] == "hello"
+    assert results[0]["lang"] == "en"
+
+
+def test_add_all_rdflib_typed_literal():
+    """Test adding an RDFLib typed literal through add_all()."""
+    g = Graph()
+
+    subject = URIRef("http://example.org/s1")
+    predicate = URIRef("http://example.org/age")
+    object_ = Literal("42", datatype=XSD.integer)
+
+    g.add((subject, predicate, object_))
+
+    store = Triplestore("graphdb", config=config)
+    store.clear()
+
+    store.add_all(g)
+
+    results = store.query(f"""
+        SELECT ?o (DATATYPE(?o) AS ?datatype)
+        WHERE {{
+            GRAPH <{config["graph"]}> {{
+                <http://example.org/s1>
+                <http://example.org/age>
+                ?o .
+            }}
+        }}
+    """)
+
+    assert len(results) == 1
+    assert results[0]["o"] == "42"
+    assert results[0]["datatype"] == str(XSD.integer)
+
+
+def test_add_all_rdflib_bnode():
+    """Test adding an RDFLib blank node through add_all()."""
+    g = Graph()
+
+    subject = BNode("b1")
+    predicate = URIRef("http://example.org/name")
+    object_ = Literal("Alice")
+
+    g.add((subject, predicate, object_))
+
+    store = Triplestore("graphdb", config=config)
+    store.clear()
+
+    store.add_all(g)
+
+    results = store.query(f"""
+        SELECT ?s ?o
+        WHERE {{
+            GRAPH <{config["graph"]}> {{
+                ?s <http://example.org/name> ?o .
+            }}
+            FILTER(isBlank(?s))
+        }}
+    """)
+
+    assert len(results) == 1
+    assert results[0]["o"] == "Alice"
+
+
+def test_add_all_rdflib_graph():
+    """Test adding a complete RDFLib graph containing different RDF term types."""
+    g = Graph()
+
+    alice = URIRef("http://example.org/alice")
+    name = URIRef("http://example.org/name")
+    age = URIRef("http://example.org/age")
+    knows = URIRef("http://example.org/knows")
+    bob = URIRef("http://example.org/bob")
+
+    g.add((alice, name, Literal("Alice", lang="en")))
+    g.add((alice, age, Literal("25", datatype=XSD.integer)))
+    g.add((alice, knows, bob))
+
+    blank = BNode()
+    g.add((blank, name, Literal("Anonymous")))
+
+    store = Triplestore("graphdb", config=config)
+    store.clear()
+
+    store.add_all(g)
+
+    results = store.query(SPARQL_QUERY)
+
+    assert len(results) == len(g)
+    assert len(results) == 4
 
 
 def test_clear():

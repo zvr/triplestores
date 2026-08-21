@@ -5,6 +5,7 @@ import logging
 import os
 import shutil
 import subprocess
+from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 
@@ -46,7 +47,8 @@ class GraphDB(TriplestoreBackend):
         """
         Initialize the GraphDB backend with the given configuration.
 
-        Parameters:
+        Parameters
+        ------
         config : dict
             A configuration dictionary containing connection parameters:
             - base_url (optional): The base URL of the GraphDB instance.
@@ -85,7 +87,8 @@ class GraphDB(TriplestoreBackend):
         - .ttl: Turtle
         - .nt: N-Triples
 
-        Parameters:
+        Parameters
+        -----
         filename : str
             Path to the RDF file to load (.ttl or .nt).
 
@@ -220,7 +223,8 @@ class GraphDB(TriplestoreBackend):
         """
         Add a triple to the GraphDB store.
 
-        Parameters:
+        Parameters
+        ------
         s : Any
             The subject value of the triple. Must serialize to an RDF IRI or blank node.
         p : Any
@@ -240,11 +244,49 @@ class GraphDB(TriplestoreBackend):
         )
         self._run_update(sparql)
 
+    def add_all(self, triples: Iterable[tuple[Any, Any, Any]]) -> None:
+        """
+        Add multiple triples to the GraphDB store.
+
+        Parameters
+        ------
+        triples : Iterable[tuple[Any, Any, Any]]
+            An iterable of RDF triples. Each triple must contain exactly three values: subject, predicate, and object.
+
+            The subject must serialize to an RDF IRI or blank node.
+            The predicate must serialize to an RDF IRI.
+            The object may serialize to an RDF IRI, blank node, or literal.
+
+            RDFLib URIRef, BNode, and Literal values are also supported.
+        """
+        serialized_triples = []
+
+        for s, p, o in triples:
+            s_term = validate_rdf_term(s, "subject", "GraphDB")
+            p_term = validate_rdf_term(p, "predicate", "GraphDB")
+            o_term = validate_rdf_term(o, "object", "GraphDB")
+
+            serialized_triples.append(f"{s_term} {p_term} {o_term} .")
+
+        if not serialized_triples:
+            return
+
+        data = "\n".join(serialized_triples)
+
+        sparql = (
+            f"INSERT DATA {{ GRAPH <{self.graph_uri}> {{ {data} }} }}"
+            if self.graph_uri else
+            f"INSERT DATA {{ {data} }}"
+        )
+
+        self._run_update(sparql)
+
     def delete(self, s: Any, p: Any, o: Any) -> None:
         """
         Delete a triple from the GraphDB store.
 
-        Parameters:
+        Parameters
+        -----
         s : Any
             The subject value of the triple. Must serialize to an RDF IRI or blank node.
         p : Any
@@ -284,7 +326,8 @@ class GraphDB(TriplestoreBackend):
         """
         Execute a SPARQL query against the GraphDB repository.
 
-        Parameters:
+        Parameters
+        ------
         sparql : str
             The SPARQL query string.
         export : bool, optional
