@@ -12,6 +12,8 @@ from collections.abc import Iterable, Mapping
 from pathlib import Path
 from typing import Any
 
+from rdflib import BNode, Literal, URIRef
+
 from triplestore.exceptions import TriplestoreMissingConfigValue
 
 logger = logging.getLogger(__name__)
@@ -424,7 +426,11 @@ def serialize_rdf_term(term: Any, backend_name: str = "backend") -> str:
         )
         raise ValueError(msg)
 
-    # 2. IRI
+    # 2. RDFLib-native RDF terms
+    if isinstance(term, (URIRef, BNode, Literal)):
+        return term.n3()
+
+    # 3. IRI
     if isinstance(term, str) and term.startswith(("http://", "https://")):
         if any(ch in term for ch in (" ", "<", ">", '"', "\n", "\r", "\t")):
             msg = (
@@ -440,7 +446,7 @@ def serialize_rdf_term(term: Any, backend_name: str = "backend") -> str:
             raise ValueError(msg)
         return f"<{term}>"
 
-    # 3. Blank node
+    # 4. Blank node
     if isinstance(term, str) and term.startswith("_:"):
         if not re.fullmatch(r"_:[A-Za-z0-9_]+", term):
             msg = (
@@ -456,19 +462,19 @@ def serialize_rdf_term(term: Any, backend_name: str = "backend") -> str:
             raise ValueError(msg)
         return term
 
-    # 4. Boolean
+    # 5. Boolean
     if isinstance(term, bool):
         return f'"{str(term).lower()}"^^<{XSD_NS}boolean>'
 
-    # 5. Integer
+    # 6. Integer
     if isinstance(term, int):
         return f'"{term}"^^<{XSD_NS}integer>'
 
-    # 6. Float
+    # 7. Float
     if isinstance(term, float):
         return f'"{term}"^^<{XSD_NS}double>'
 
-    # 7. Advanced literal (Mapping)
+    # 8. Advanced literal (Mapping)
     if isinstance(term, Mapping):
         value = term.get("value")
         datatype = term.get("datatype")
@@ -531,11 +537,11 @@ def serialize_rdf_term(term: Any, backend_name: str = "backend") -> str:
 
         return f'"{escaped}"'
 
-    # 8. String literal
+    # 9. String literal
     if isinstance(term, str):
         return f'"{_escape_literal(term)}"'
 
-    # 9. Unsupported type
+    # 10. Unsupported type
     msg = (
         f"[{backend_name}] Unsupported RDF term type: {type(term).__name__}\n"
         f"Received value: {term!r}\n\n"

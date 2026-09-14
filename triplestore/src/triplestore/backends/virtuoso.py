@@ -3,6 +3,7 @@
 
 import logging
 import os
+from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
@@ -139,7 +140,7 @@ class Virtuoso(TriplestoreBackend):
         if not Path(filename).exists():
             msg = f"[Virtuoso] File not found: {filename}"
             raise FileNotFoundError(msg)
-        
+
         content_type = get_rdf_content_type(filename, backend_name="Virtuoso")
         headers = {"Content-Type": content_type}
 
@@ -168,12 +169,49 @@ class Virtuoso(TriplestoreBackend):
         o_term = validate_rdf_term(o, "object", "Virtuoso")
 
         triple = f"{s_term} {p_term} {o_term} ."
-        sparql = (
-            f"INSERT DATA {{ GRAPH <{self.graph_uri}> {{ {triple} }} }}"
-            if self.graph_uri
-            else f"INSERT DATA {{ {triple} }}"
-        )
-        self._run_update(sparql)
+
+        params = {"graph-uri": self.graph_uri} if self.graph_uri else {}
+        response = requests.post(self.graph_store_url, headers=self.headers_load, params=params, data=triple.encode("utf-8"), auth=self.auth, timeout=None)
+
+        if response.status_code not in {200, 201, 204}:
+            msg = f"[Virtuoso] SPARQL update failed: {response.status_code}\n{response.text}"
+            raise RuntimeError(msg)
+
+    def add_all(self, triples: Iterable[tuple[Any, Any, Any]]) -> None:
+        """
+        Add multiple triples to the Virtuoso store.
+
+        Parameters
+        ------
+        triples : Iterable[tuple[Any, Any, Any]]
+            An iterable of RDF triples. Each triple must contain exactly three values: subject, predicate, and object.
+
+            The subject must serialize to an RDF IRI or blank node.
+            The predicate must serialize to an RDF IRI.
+            The object may serialize to an RDF IRI, blank node, or literal.
+
+            RDFLib URIRef, BNode, and Literal values are also supported.
+        """
+        serialized_triples = []
+
+        for s, p, o in triples:
+            s_term = validate_rdf_term(s, "subject", "Virtuoso")
+            p_term = validate_rdf_term(p, "predicate", "Virtuoso")
+            o_term = validate_rdf_term(o, "object", "Virtuoso")
+
+            serialized_triples.append(f"{s_term} {p_term} {o_term} .")
+
+        if not serialized_triples:
+            return
+
+        data = "\n".join(serialized_triples)
+
+        params = {"graph-uri": self.graph_uri} if self.graph_uri else {}
+        response = requests.post(self.graph_store_url, headers=self.headers_load, params=params, data=data.encode("utf-8"), auth=self.auth, timeout=None)
+
+        if response.status_code not in {200, 201, 204}:
+            msg = f"[Virtuoso] SPARQL update failed: {response.status_code}\n{response.text}"
+            raise RuntimeError(msg)
 
     def delete(self, s: Any, p: Any, o: Any) -> None:
         """
