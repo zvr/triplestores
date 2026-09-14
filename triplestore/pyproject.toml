@@ -1,16 +1,31 @@
 [project]
 name = "triplestore"
 version = "0.1.0"
-description = "A unified abstraction layer for interacting with multiple RDF triplestore backends."
+description = "A unified abstraction layer for interacting with multiple RDF triplestore backends"
 readme = "README.md"
 authors = [
-    { name = "Alexios Zavras (zvr)", email = "zvr+git@zvr.gr" },
-    { name = "Maira Papadopoulou", email = "" },
+    { name = "Alexios Zavras (zvr)", email = "python@zvr.gr" },
+    { name = "Maira Papadopoulou" },
 ]
-
+maintainers = [
+    { name = "Alexios Zavras (zvr)", email = "python@zvr.gr" },
+    { name = "Maira Papadopoulou" },
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "Apache-2.0"
+license-files = ["LICENSE"]
 requires-python = ">=3.10"
 
 dependencies = []
+
+[project.urls]
+homepage = "https://github.com/eellak/triplestore"
+source = "https://github.com/eellak/triplestore.git"
+github = "https://github.com/eellak/triplestore"
+issues = "https://github.com/eellak/triplestore/issues"
 
 [build-system]
 requires = ["hatchling"]
