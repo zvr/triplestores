@@ -9,7 +9,7 @@ authors = [
 ]
 maintainers = [
     { name = "Alexios Zavras (zvr)", email = "python@zvr.gr" },
-    { name = "Maira Papadopoulou", "mmpapadopoulouu@gmail.com" },
+    { name = "Maira Papadopoulou", email = "mmpapadopoulouu@gmail.com" },
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
