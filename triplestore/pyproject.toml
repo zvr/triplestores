@@ -1,15 +1,15 @@
 [project]
 name = "rdf-triplestore"
-version = "0.1.0"
+version = "0.1.1"
 description = "A unified abstraction layer for interacting with multiple RDF triplestore backends"
 readme = "README.md"
 authors = [
     { name = "Alexios Zavras (zvr)", email = "python@zvr.gr" },
-    { name = "Maira Papadopoulou" },
+    { name = "Maira Papadopoulou", email = "mmpapadopoulouu@gmail.com" },
 ]
 maintainers = [
     { name = "Alexios Zavras (zvr)", email = "python@zvr.gr" },
-    { name = "Maira Papadopoulou" },
+    { name = "Maira Papadopoulou", "mmpapadopoulouu@gmail.com" },
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
