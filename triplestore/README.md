@@ -28,18 +28,18 @@ Currently supported backends (alphabetically):
 You can install the library along with **all supported backends** using:
 
 ```bash
-pip install triplestore
+pip install rdf-triplestore
 # or
-pip install triplestore[all]
+pip install rdf-triplestore[all]
 ```
 
 Alternatively, you can install the library with a **specific backend** only:
 ```bash
-pip install triplestore[<backend>]
+pip install rdf-triplestore[<backend>]
 ```
 For example:
 ```bash
-pip install triplestore[oxigraph]
+pip install rdf-triplestore[oxigraph]
 ```
 
 ## Usage

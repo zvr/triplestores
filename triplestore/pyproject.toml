@@ -1,5 +1,5 @@
 [project]
-name = "triplestore"
+name = "rdf-triplestore"
 version = "0.1.0"
 description = "A unified abstraction layer for interacting with multiple RDF triplestore backends"
 readme = "README.md"
