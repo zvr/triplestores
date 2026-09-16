@@ -1,4 +1,4 @@
-# Triplestore Abstraction Library
+# rdf-triplestore Abstraction Library
 
 This library provides a unified interface for interacting
 with various RDF and GeoSPARQL triplestore backends.
@@ -35,7 +35,6 @@ You can install the library along with **all supported backends** using:
 pip install rdf-triplestore
 # or
 pip install rdf-triplestore[all]
-pip install triplestore[all]
 ```
 
 Alternatively, you can install the library with a **specific backend** only:

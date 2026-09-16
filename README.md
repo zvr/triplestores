@@ -1,8 +1,8 @@
-# triplestore
+# rdf-triplestore
 
 > A backend-agnostic Python interface for loading, querying, and modifying [RDF](https://www.w3.org/RDF/) data across multiple triplestore implementations.
 
-`triplestore` is a Python library that provides a unified API over multiple RDF triplestore backends. It lets users load RDF data, execute SPARQL queries and updates, and switch between supported backends without rewriting application code.
+`rdf-triplestore` is a Python library that provides a unified API over multiple RDF triplestore backends. It lets users load RDF data, execute SPARQL queries and updates, and switch between supported backends without rewriting application code.
 
 The library reduces the complexity of working with triplestores by hiding backend-specific configuration details behind a common Python interface. This makes it easier to load, query, and update RDF triples without having to learn the operational details of each individual backend. It also supports experimentation and benchmarking by allowing the same code to run against different triplestore implementations.
 
@@ -27,15 +27,15 @@ The released version of this software has been archived on Zenodo and is availab
 ## Installation
 Install all backend dependencies:
 ```bash
-pip install triplestore[all]
+pip install rdf-triplestore[all]
 ```
 Install a specific backend extra:
 ```bash
-pip install triplestore[<backend>]
+pip install rdf-triplestore[<backend>]
 ```
 Install optional GeoSPARQL-related dependencies:
 ```bash
-pip install triplestore[geo]
+pip install rdf-triplestore[geo]
 ```
 
 ## Quick Start

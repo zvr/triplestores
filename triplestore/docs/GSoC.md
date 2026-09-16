@@ -28,7 +28,7 @@ Overall, all major objectives were achieved as planned, resulting in a stable, w
 Working with RDF triplestores often requires developers to adapt to the unique APIs, connection methods, and data management models of each system. This leads to vendor lock-in, repetitive code, and difficulty in migrating between different backends. The lack of a unified interface makes benchmarking, experimentation, and maintenance unnecessarily complex.
 
 ### Solution
-The `triplestore` library was developed to solve this interoperability problem by introducing a unified abstraction layer. Through this layer, applications can interact with various triplestores in a consistent way—executing SPARQL queries, loading data, or clearing repositories—without changing their application code. This design enables flexibility, portability, and easier evaluation of different triplestore systems.
+The `rdf-triplestore` library was developed to solve this interoperability problem by introducing a unified abstraction layer. Through this layer, applications can interact with various triplestores in a consistent way—executing SPARQL queries, loading data, or clearing repositories—without changing their application code. This design enables flexibility, portability, and easier evaluation of different triplestore systems.
 
 ### Architectural Design
 The library follows an object-oriented architecture.
@@ -67,7 +67,7 @@ This research phase provided a clear understanding of each system’s capabiliti
 ### Testing & Analysis before the Library Development
 The next phase focused on **empirical testing and performance analysis** of the triplestores prior to the actual implementation of the abstraction layer. Together with my mentor, we designed a general benchmarking script called `skeleton.py`, which served as a reusable template for evaluating each triplestore under identical conditions.
 
-A dedicated [bench/](/bench/) directory was then created to organize and run the performance tests. These scripts measured key performance metrics such as:
+A dedicated [bench/](../bench/) directory was then created to organize and run the performance tests. These scripts measured key performance metrics such as:
 - Data loading time – how efficiently each triplestore ingests RDF datasets.
 - Query execution time – how quickly each system responds to representative SPARQL queries.
 
@@ -81,18 +81,18 @@ Through this process, it became evident that MillenniumDB, while promising in de
 The development phase focused on designing a modular and extensible architecture that could dynamically support multiple triplestore backends under a unified interface.
 - Abstract Base Class `TriplestoreBackend`:
 
-The core of the system is an abstract base class that defines the essential API methods, `load()`, `query()`, `execute()`, `add()`, `delete()`, and `clear()`, which all backend implementations must provide. This design ensures that each backend adheres to a consistent contract while allowing flexibility in how operations are executed internally. Implemented in [base.py](/triplestore/src/triplestore/base.py).
+The core of the system is an abstract base class that defines the essential API methods, `load()`, `query()`, `execute()`, `add()`, `delete()`, and `clear()`, which all backend implementations must provide. This design ensures that each backend adheres to a consistent contract while allowing flexibility in how operations are executed internally. Implemented in [base.py](../../triplestore/src/rdf_triplestore/base.py).
 
 - Dynamic Backend Discovery:
 
-The library uses Python’s entry points mechanism to dynamically discover and register available backends at runtime. The modules [registration.py](/triplestore/src/triplestore/registration.py) and [triplestore.py](/triplestore/src/triplestore/triplestore.py) handle this process, exposing helper functions such as `available_backends()` and a factory constructor `Triplestore(backend, config)`.
+The library uses Python’s entry points mechanism to dynamically discover and register available backends at runtime. The modules [registration.py](../../triplestore/src/rdf_triplestore/registration.py) and [triplestore.py](../../triplestore/src/rdf_triplestore/triplestore.py) handle this process, exposing helper functions such as `available_backends()` and a factory constructor `Triplestore(backend, config)`.
 This allows users to instantiate any supported backend without hardcoding imports or dependencies.
 - Factory Design Pattern:
 
 The factory function `Triplestore()` validates input parameters, ensures that the requested backend is registered and importable, and returns an instance of the corresponding backend class. This encapsulation simplifies user experience while maintaining strict type and dependency checks.
 - Exception Hierarchy:
 
-A dedicated exception system was introduced to provide precise error reporting and improve debuggability. Custom exceptions such as `BackendNotFoundError` and `BackendNotInstalledError` clearly communicate configuration or installation issues to the user. Defined in [exceptions.py](/triplestore/src/triplestore/exceptions.py)
+A dedicated exception system was introduced to provide precise error reporting and improve debuggability. Custom exceptions such as `BackendNotFoundError` and `BackendNotInstalledError` clearly communicate configuration or installation issues to the user. Defined in [exceptions.py](../../triplestore/src/rdf_triplestore/exceptions.py)
 
 #### Backend Implementation
 
@@ -100,7 +100,7 @@ As it was mentioned before the library provides support for 5 triplestores **Apa
 
 - Apache Jena:
 
-The Apache Jena backend required special handling due to its slow data-loading performance when operating through the default Fuseki server setup. To address this, I developed a dedicated utility module, [jena_utils.py](/triplestore/src/triplestore/backends/jena_utils.py) , which configures and launches the Fuseki server with optimized parameters. The key improvement was the introduction of a configurable environment variable, `FUSEKI_HOME`, which allows users to specify the local installation path of Fuseki. This enables the backend to start the server directly from a local setup with custom memory and configuration settings, resulting in noticeably faster data ingestion. Once these optimizations were implemented, all core functions— `load()`, `query()`, `execute()`, `add()`, `delete()`, and `clear()` —operated reliably within the unified abstraction layer.
+The Apache Jena backend required special handling due to its slow data-loading performance when operating through the default Fuseki server setup. To address this, I developed a dedicated utility module, [jena_utils.py](../../triplestore/src/rdf_triplestore/backends/jena_utils.py) , which configures and launches the Fuseki server with optimized parameters. The key improvement was the introduction of a configurable environment variable, `FUSEKI_HOME`, which allows users to specify the local installation path of Fuseki. This enables the backend to start the server directly from a local setup with custom memory and configuration settings, resulting in noticeably faster data ingestion. Once these optimizations were implemented, all core functions— `load()`, `query()`, `execute()`, `add()`, `delete()`, and `clear()` —operated reliably within the unified abstraction layer.
 
 - AllegroGraph: 
 
@@ -121,7 +121,7 @@ The Oxigraph backend was by far the fastest and most straightforward to integrat
 Thanks to this library, all core methods, including data loading, querying, and dataset management, were implemented with minimal overhead and performed efficiently.
 
 #### Testing and Validation
-Throughout the development process, `pytest` was used extensively to validate the correctness and consistency of the abstraction layer. Each backend—**AllegroGraph, Blazegraph, GraphDB, Apache Jena, and Oxigraph**—was assigned its own dedicated test file under the [tests/](/triplestore/tests) directory, ensuring backend-specific coverage and reproducibility.
+Throughout the development process, `pytest` was used extensively to validate the correctness and consistency of the abstraction layer. Each backend—**AllegroGraph, Blazegraph, GraphDB, Apache Jena, and Oxigraph**—was assigned its own dedicated test file under the [tests/](../tests) directory, ensuring backend-specific coverage and reproducibility.
 
 The tests verified all core operations defined by the abstraction layer, including:
 - Adding and deleting triples
@@ -135,18 +135,18 @@ Additionally, a meta-test runner (`test_all_backends.py`) was created to execute
 The library was packaged according to modern Python standards. The configuration is defined in the [pyproject.toml](/triplestore/pyproject.toml) file, ensuring a clean, reproducible, and dependency-managed installation process.
 
 To provide flexibility, users can choose to install the unified abstraction layer either as a minimal package or with support for a specific triplestore. This is achieved through the `optional-dependencies` section in `pyproject.toml`, which defines extras such as:
-- `triplestore[allegrograph]`
-- `triplestore[blazegraph]`
-- `triplestore[graphdb]`
-- `triplestore[jena]`
-- `triplestore[oxigraph]`
+- `rdf-triplestore[allegrograph]`
+- `rdf-triplestore[blazegraph]`
+- `rdf-triplestore[graphdb]`
+- `rdf-triplestore[jena]`
+- `rdf-triplestore[oxigraph]`
 
-A combined extra, `triplestore[all]`, installs all supported backends simultaneously for developers who wish to experiment across multiple systems. This modular packaging design reduces unnecessary dependencies and aligns with Python’s best practices for extensible, backend-agnostic libraries.
+A combined extra, `rdf-triplestore[all]`, installs all supported backends simultaneously for developers who wish to experiment across multiple systems. This modular packaging design reduces unnecessary dependencies and aligns with Python’s best practices for extensible, backend-agnostic libraries.
 
 ### Benchmarking
-To evaluate the impact of the unified abstraction layer, an extensive benchmarking study was conducted across five RDF triplestores — **AllegroGraph, Apache Jena, Blazegraph, GraphDB, and Oxigraph** — both before and after integrating the `triplestore` library.
+To evaluate the impact of the unified abstraction layer, an extensive benchmarking study was conducted across five RDF triplestores — **AllegroGraph, Apache Jena, Blazegraph, GraphDB, and Oxigraph** — both before and after integrating the `rdf-triplestore` library.
 
-The benchmarking framework, implemented in [skeleton.py](/triplestore/bench/skeleton.py), ensured consistent testing conditions through nanosecond-precision timers and a standardized execution workflow. Each benchmark followed the same sequence: backend initialization, data loading from a Turtle (`.ttl`) file, and SPARQL query execution on a generated family dataset. Datasets of three sizes (≈20k, 200k, and 2M triples) were created using [generate-data.py](/data/generate/generate-data.py).
+The benchmarking framework, implemented in [skeleton.py](../../bench/skeleton.py), ensured consistent testing conditions through nanosecond-precision timers and a standardized execution workflow. Each benchmark followed the same sequence: backend initialization, data loading from a Turtle (`.ttl`) file, and SPARQL query execution on a generated family dataset. Datasets of three sizes (≈20k, 200k, and 2M triples) were created using [generate-data.py](../../data/generate/generate-data.py).
 
 The measurements captured loading, query, and overall execution time for each triplestore. The results demonstrated that, while raw timings varied depending on the backend, the abstraction layer introduced negligible or no performance penalty in most cases. AllegroGraph, GraphDB, and Oxigraph maintained nearly identical or slightly improved performance. Blazegraph showed stable behavior on small datasets but slower ingestion on large ones, a limitation inherent to its internal batching. Apache Jena exhibited longer load times, mainly because the Fuseki server startup is now handled automatically and thus included in the total runtime.
 
@@ -177,7 +177,7 @@ An entirely new exception hierarchy was introduced (`exceptions.py`) to enhance 
 
 #### Documentation and Packaging Improvements
 The documentation was written directly in Markdown and integrated into the repository, replacing the originally proposed LaTeX format. This choice improved maintainability and accessibility for contributors.
-In addition, the project introduced modular packaging via `pyproject.toml`, allowing users to install only the specific triplestore backends they require (e.g., `triplestore[jena]`, `triplestore[graphdb]`, or `triplestore[all]`). This approach reduces dependencies and improves flexibility for both users and developers.
+In addition, the project introduced modular packaging via `pyproject.toml`, allowing users to install only the specific triplestore backends they require (e.g., `rdf-triplestore[jena]`, `rdf-triplestore[graphdb]`, or `rdf-triplestore[all]`). This approach reduces dependencies and improves flexibility for both users and developers.
 
 ## Future Work
 Building upon the benchmarking outcomes, several directions for further enhancement can be explored.

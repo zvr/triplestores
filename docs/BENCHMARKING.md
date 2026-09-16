@@ -1,7 +1,7 @@
-# Benchmarking RDF Triplestores Before and After Integrating the `triplestore` Abstraction Library
+# Benchmarking RDF Triplestores Before and After Integrating the `rdf-triplestore` Abstraction Library
 
 ## Abstract
-This report presents a comparative benchmarking study of five RDF triplestores—**AllegroGraph, Apache Jena, Blazegraph, GraphDB, and Oxigraph**—conducted before and after the integration of the unified `triplestore` abstraction library.
+This report presents a comparative benchmarking study of five RDF triplestores—**AllegroGraph, Apache Jena, Blazegraph, GraphDB, and Oxigraph**—conducted before and after the integration of the unified `rdf-triplestore` abstraction library.
 The goal of this evaluation was to assess whether the abstraction layer introduces measurable overhead or efficiency improvements in typical triplestore operations such as dataset loading and SPARQL querying.
 
 All experiments were executed under a consistent setup using a unified Python benchmarking framework, [skeleton.py](/triplestore/bench/skeleton.py), which implements a reproducible timing mechanism based on nanosecond-precision counters.
@@ -11,7 +11,7 @@ For each triplestore, the following standardized sequence was performed:
 - **Data loading** of a Turtle (`.ttl`) dataset into the store.
 - **Query execution** over randomly selected individuals from a synthetic family dataset.
 
-The datasets were generated using the [generate-data.py](/data/generate/generate-data.py) utility, designed to produce RDF graphs at different scales to test system scalability.
+The datasets were generated using the [generate-data.py](../data/generate/generate-data.py) utility, designed to produce RDF graphs at different scales to test system scalability.
 Three dataset sizes were used:
 - `data_20k_triples.ttl` — ~23k triples
 ```bash
@@ -31,7 +31,7 @@ python generate-data.py --initial-fams 15 --max-children 8 --pristine-gens 6 --m
 ## Results
 
 ### `data_20k_triples.ttl`
-| Triplestore      | Load (before) | Load (after) | Query (before) | Query (after) | Overall (before) | Overall (after) |
+| rdf-triplestore      | Load (before) | Load (after) | Query (before) | Query (after) | Overall (before) | Overall (after) |
 | ---------------- | ------------- | ------------ | -------------- | ------------- | ---------------- | --------------- |
 | **AllegroGraph** | 0.47 s        | 0.35 s       | 1.32 s         | 1.01 s        | 5.33 s           | 4.25 s          |
 | **Apache Jena**  | 1.08 s        | 4.54 s       | 1.95 s         | 1.22 s        | 7.71 s           | 18.26 s         |
@@ -48,7 +48,7 @@ python generate-data.py --initial-fams 15 --max-children 8 --pristine-gens 6 --m
 
 
 ### `data_200k_triples.ttl`
-| Triplestore      | Load (before) | Load (after) | Query (before) | Query (after) | Overall (before) | Overall (after) |
+| rdf-triplestore      | Load (before) | Load (after) | Query (before) | Query (after) | Overall (before) | Overall (after) |
 | ---------------- | ------------- | ------------ | -------------- | ------------- | ---------------- | --------------- |
 | **AllegroGraph** | 3.46 s        | 2.49 s       | 1.02 s         | 0.75 s        | 6.74 s           | 5.98 s          |
 | **Apache Jena**  | 3.93 s        | 9.38 s       | 2.66 s         | 1.45 s        | 11.25 s          | 23.85 s         |
@@ -65,7 +65,7 @@ python generate-data.py --initial-fams 15 --max-children 8 --pristine-gens 6 --m
 
 
 ### `data_2M_triples.ttl`
-| Triplestore      | Load (before) | Load (after) | Query (before) | Query (after) | Overall (before) | Overall (after) |
+| rdf-triplestore      | Load (before) | Load (after) | Query (before) | Query (after) | Overall (before) | Overall (after) |
 | ---------------- | ------------- | ------------ | -------------- | ------------- | ---------------- | --------------- |
 | **AllegroGraph** | 47.63 s       | 47.90 s      | 2.05 s         | 1.93 s        | 55.36 s          | 57.34 s         |
 | **Apache Jena**  | 51.28 s       | 108.57 s     | 2.56 s         | 1.75 s        | 63.58 s          | 126.15 s        |
@@ -81,7 +81,7 @@ python generate-data.py --initial-fams 15 --max-children 8 --pristine-gens 6 --m
 - **Oxigraph**: Continued to exhibit excellent performance and scalability. The small increase in overall runtime (~4 s) can be attributed to Python-level initialization and serialization overhead rather than backend inefficiency.
 
 ## Conclusion
-The benchmarking results reveal that, while the raw execution times vary across triplestores, the integration of the `triplestore` abstraction library provides a substantial improvement in usability, consistency, and developer experience without introducing significant performance degradation.
+The benchmarking results reveal that, while the raw execution times vary across triplestores, the integration of the `rdf-triplestore` abstraction library provides a substantial improvement in usability, consistency, and developer experience without introducing significant performance degradation.
 
 Specifically, in some cases, such as Apache Jena, the total runtime after integration increased, mainly due to the server initialization being measured as part of the execution. However, this additional cost is offset by a major simplification in workflow: before the library, developers had to manually manage HTTP servers, construct dataset upload commands, and format queries according to each backend’s custom API.
 Now, the same operation is achieved simply by calling `store.load(file)` and the library automatically handles connection setup, data ingestion, and error reporting behind the scenes.

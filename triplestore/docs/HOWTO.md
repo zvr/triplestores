@@ -1,4 +1,4 @@
-# Triplestore
+# rdf-triplestore
 
 ## Overview
 A unified Python abstraction layer over multiple RDF triplestores, with optional GeoSPARQL-related support when provided by the selected backend.
@@ -24,21 +24,21 @@ This package provides a consistent interface for loading data, executing SPARQL 
 You can install the library along with **all supported backends** using:
 
 ```bash
-pip install triplestore[all]
+pip install rdf-triplestore[all]
 ```
 
 Alternatively, you can install the library with a **specific backend** only:
 ```bash
-pip install triplestore[<backend>]
+pip install rdf-triplestore[<backend>]
 ```
 For example:
 ```bash
-pip install triplestore[oxigraph]
+pip install rdf-triplestore[oxigraph]
 ```
 
 GeoSPARQL-related dependencies are optional and can be installed separately with:
 ```bash
-pip install triplestore[geo]
+pip install rdf-triplestore[geo]
 ```
 
 ## How-To

@@ -1,6 +1,6 @@
-# Triplestore Demo Scripts
+# `rdf-triplestore` Demo Scripts
 
-This folder contains example scripts that showcase how to use the **`triplestore`** library to load RDF data, run SPARQL queries, and clear graphs across different backends. It also emphasizes the abstraction between triplestores.
+This folder contains example scripts that showcase how to use the **`rdf-triplestore`** library to load RDF data, run SPARQL queries, and clear graphs across different backends. It also emphasizes the abstraction between triplestores.
 
 ## Contents
 
@@ -21,7 +21,7 @@ All demos:
 ## How to Run
 
 **Prerequisites:**  
-- The `triplestore` library must be installed.  
+- The `rdf-triplestore` library must be installed.  
 - Backends must be running and accessible (except for **Jena**, which is automatically started by the script).
 
 ### Unified demo for any backend
