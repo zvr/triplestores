@@ -1,12 +1,12 @@
-# `triplestore` (package internals)
+# `rdf-triplestore` (package internals)
 
 ## Overview
-This document describes the **internal layout and design** of the `src/triplestore/` package.
+This document describes the **internal layout and design** of the `src/rdf_triplestore/` package.
 It is aimed at contributors who want to understand how the library is organized internally—how backends are discovered, registered, and instantiated, and how they interact through the unified API surface.
 
 ## Directory Structure
 ```text
-src/triplestore/
+src/rdf_triplestore/
 ├── backends/             # Individual backend implementations
 │   ├── __init__.py
 │   ├── allegrograph.py
@@ -81,7 +81,7 @@ Raised by `validate_config()` when required configuration keys are absent.
 
 ## Backend Discovery & Registration (`registration.py`)
 
-Backends are discovered dynamically through the entry point group [`triplestore.backends`](/triplestore/pyproject.toml). At runtime, a registry is built from installed entry points, and `available_backends()` returns only those that can actually be imported. This mechanism supports optional extras: unused backends can ship with the package but remain inactive unless their dependencies are installed.
+Backends are discovered dynamically through the entry point group [`triplestore.backends`](../../pyproject.toml). At runtime, a registry is built from installed entry points, and `available_backends()` returns only those that can actually be imported. This mechanism supports optional extras: unused backends can ship with the package but remain inactive unless their dependencies are installed.
 
 ## Constructor (`triplestore.py`)
 The Triplestore() function is the main entry point for creating backend instances: 

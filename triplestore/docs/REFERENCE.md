@@ -25,12 +25,12 @@ This constructor abstracts away the differences between triplestore implementati
 A `Triplestore` instance bound to the chosen backend.
 
 **Exceptions**
-- `BackendNotFoundError`: Raised when the requested backend name is not registered in the current installation of `triplestore`.
+- `BackendNotFoundError`: Raised when the requested backend name is not registered in the current installation of `rdf-triplestore`.
 This means that the backend is not supported by the installed package.
 - `BackendNotInstalledError`: Raised when the backend is known to the package (registered) but cannot be imported because its optional dependencies are missing.  
 Typically resolved by installing the backend extra with:
 ```bash
-pip install triplestore[<backend>]
+pip install rdf-triplestore[<backend>]
 ```
 - `ValueError`: Raised when `backend` is a blank string.
 - `TypeError`: 
