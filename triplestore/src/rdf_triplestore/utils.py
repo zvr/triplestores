@@ -14,7 +14,7 @@ from typing import Any
 
 from rdflib import BNode, Literal, URIRef
 
-from triplestore.exceptions import TriplestoreMissingConfigValue
+from rdf_triplestore.exceptions import TriplestoreMissingConfigValue
 
 logger = logging.getLogger(__name__)
 
@@ -236,11 +236,11 @@ def resolve_export_format(query_type: str, *, export: bool, output_format: str |
 
 def _export_geospatial_select_results(*args, backend_name: str, **kwargs):
     try:
-        from triplestore.utils_geo import export_geospatial_select_results
+        from rdf_triplestore.utils_geo import export_geospatial_select_results
     except ImportError as exc:
         msg = (
             f"[{backend_name}] Geospatial export requires the optional geo dependencies. "
-            "Install it with: pip install triplestore[geo]"
+            "Install it with: pip install rdf-triplestore[geo]"
         )
         raise RuntimeError(msg) from exc
 

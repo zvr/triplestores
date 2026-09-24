@@ -4,9 +4,9 @@
 from importlib import import_module
 from typing import Any
 
-from triplestore.base import TriplestoreBackend
-from triplestore.exceptions import BackendNotFoundError, BackendNotInstalledError
-from triplestore.registration import EXTRA_HINT, REGISTRY, available_backends, discover_backends, is_importable
+from rdf_triplestore.base import TriplestoreBackend
+from rdf_triplestore.exceptions import BackendNotFoundError, BackendNotInstalledError
+from rdf_triplestore.registration import EXTRA_HINT, REGISTRY, available_backends, discover_backends, is_importable
 
 
 def Triplestore(backend: str, config: dict[str, Any]) -> TriplestoreBackend:
@@ -65,7 +65,7 @@ def Triplestore(backend: str, config: dict[str, Any]) -> TriplestoreBackend:
     # Unsupported in the installed distribution
     if not cls_path:
         msg = (
-            f"Backend '{name}' is not recognized by this installation of 'triplestore'.\n\n"
+            f"Backend '{name}' is not recognized by this installation of 'rdf_triplestore'.\n\n"
             f"Supported backends in this package: {supported}.\n"
             f"Currently available backends: {available}.\n"
         )
@@ -76,7 +76,7 @@ def Triplestore(backend: str, config: dict[str, Any]) -> TriplestoreBackend:
         extra = EXTRA_HINT.get(name, name)
         msg = (
             f"Backend '{name}' is not installed.\n"
-            f"To install it, run: pip install triplestore[{extra}].\n\n"
+            f"To install it, run: pip install rdf-triplestore[{extra}].\n\n"
             f"Supported backends: {supported}.\n"
             f"Currently available backends: {available}\n"
         )

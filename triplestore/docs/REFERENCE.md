@@ -11,7 +11,7 @@ By using the `Triplestore`, you can write code that is portable across different
 
 # Triplestore Objects
 
-`class triplestore.Triplestore(backend: str, config: dict[str, Any])`
+`class rdf_triplestore.Triplestore(backend: str, config: dict[str, Any])`
 
 **Purpose**: Create a backend-specific client instance under a unified API.  
 This constructor abstracts away the differences between triplestore implementations and ensures a consistent interface across all supported backends.

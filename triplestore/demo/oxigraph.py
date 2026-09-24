@@ -1,7 +1,7 @@
 # Copyright (C) 2025 Maira Papadopoulou
 # SPDX-License-Identifier: Apache-2.0
 
-from triplestore import Triplestore
+from rdf_triplestore import Triplestore
 
 config = {
     "graph": "http://example.org/test"

@@ -33,9 +33,9 @@ def discover_backends() -> None:
         return
 
     try:
-        eps = metadata.entry_points(group="triplestore.backends")
+        eps = metadata.entry_points(group="rdf_triplestore.backends")
     except TypeError:
-        eps = metadata.entry_points().get("triplestore.backends", [])
+        eps = metadata.entry_points().get("rdf_triplestore.backends", [])
 
     REGISTRY.clear()
     for ep in eps:

@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-from triplestore import Triplestore
+from rdf_triplestore import Triplestore
 
 config = {
     "name": "test2025",

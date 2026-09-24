@@ -14,7 +14,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from bench.benchmark import bench_report, benchmark
-from triplestore import Triplestore
+from rdf_triplestore import Triplestore
 
 # configuration
 config = {

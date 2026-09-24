@@ -17,7 +17,7 @@ import pytest
 import requests
 from rdflib import BNode, Graph, Literal, URIRef
 from rdflib.namespace import XSD
-from triplestore import Triplestore
+from rdf_triplestore import Triplestore
 
 # SPARQL Test Data
 SUBJECT = "http://example.org/s"

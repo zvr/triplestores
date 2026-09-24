@@ -17,7 +17,7 @@ from pathlib import Path
 
 import pytest
 import requests
-from triplestore import Triplestore
+from rdf_triplestore import Triplestore
 
 SUBJECT = "http://example.org/featureA"
 PREDICATE = "http://www.opengis.net/ont/geosparql#hasGeometry"

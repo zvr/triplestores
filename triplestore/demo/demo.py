@@ -7,7 +7,7 @@ import argparse
 from contextlib import suppress
 from typing import Any
 
-from triplestore import Triplestore, available_backends
+from rdf_triplestore import Triplestore, available_backends
 
 GRAPH_IRI = "http://example.org/test"
 

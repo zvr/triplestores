@@ -71,15 +71,15 @@ dev = [
     "build"
 ]
 
-[project.entry-points."triplestore.backends"]
-allegrograph = "triplestore.backends.allegrograph:AllegroGraph"
-blazegraph   = "triplestore.backends.blazegraph:Blazegraph"
-graphdb      = "triplestore.backends.graphdb:GraphDB"
-jena         = "triplestore.backends.jena:Jena"
-oxigraph     = "triplestore.backends.oxigraph:Oxigraph"
-qlever       = "triplestore.backends.qlever:QLever"
-rdf4j        = "triplestore.backends.rdf4j:RDF4J"
-virtuoso     = "triplestore.backends.virtuoso:Virtuoso"
+[project.entry-points."rdf_triplestore.backends"]
+allegrograph = "rdf_triplestore.backends.allegrograph:AllegroGraph"
+blazegraph   = "rdf_triplestore.backends.blazegraph:Blazegraph"
+graphdb      = "rdf_triplestore.backends.graphdb:GraphDB"
+jena         = "rdf_triplestore.backends.jena:Jena"
+oxigraph     = "rdf_triplestore.backends.oxigraph:Oxigraph"
+qlever       = "rdf_triplestore.backends.qlever:QLever"
+rdf4j        = "rdf_triplestore.backends.rdf4j:RDF4J"
+virtuoso     = "rdf_triplestore.backends.virtuoso:Virtuoso"
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]

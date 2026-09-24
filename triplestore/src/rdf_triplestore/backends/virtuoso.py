@@ -11,8 +11,8 @@ from urllib.parse import urlparse
 import requests
 from requests.auth import HTTPDigestAuth
 
-from triplestore.base import TriplestoreBackend
-from triplestore.utils import (
+from rdf_triplestore.base import TriplestoreBackend
+from rdf_triplestore.utils import (
     export_ask_result,
     export_rdf_result,
     export_select_results,

@@ -11,8 +11,8 @@ from typing import Any
 
 import requests
 
-from triplestore.base import TriplestoreBackend
-from triplestore.utils import (
+from rdf_triplestore.base import TriplestoreBackend
+from rdf_triplestore.utils import (
     detect_graphdb_url,
     export_ask_result,
     export_rdf_result,

@@ -32,7 +32,7 @@ src/rdf_triplestore/
 ## Public API Surface (`__init__.py`)
 The `__init__.py` file defines the library’s public API surface.
 - It re-exports the core classes (`Triplestore`, `TriplestoreBackend`) used to construct and manage backend connections.
-- It exposes the key exceptions (`BackendNotFoundError`, `BackendNotInstalledError`, `TriplestoreError`, `TriplestoreMissingConfigValue`) so they can be imported directly from triplestore without referencing internal modules.
+- It exposes the key exceptions (`BackendNotFoundError`, `BackendNotInstalledError`, `TriplestoreError`, `TriplestoreMissingConfigValue`) so they can be imported directly from rdf_triplestore without referencing internal modules.
 - It makes available the utility function `available_backends`, which lists the backends currently usable in the environment.
 
 ## Base Interface (`base.py`)
@@ -81,7 +81,7 @@ Raised by `validate_config()` when required configuration keys are absent.
 
 ## Backend Discovery & Registration (`registration.py`)
 
-Backends are discovered dynamically through the entry point group [`triplestore.backends`](../../pyproject.toml). At runtime, a registry is built from installed entry points, and `available_backends()` returns only those that can actually be imported. This mechanism supports optional extras: unused backends can ship with the package but remain inactive unless their dependencies are installed.
+Backends are discovered dynamically through the entry point group [`rdf_triplestore.backends`](../../pyproject.toml). At runtime, a registry is built from installed entry points, and `available_backends()` returns only those that can actually be imported. This mechanism supports optional extras: unused backends can ship with the package but remain inactive unless their dependencies are installed.
 
 ## Constructor (`triplestore.py`)
 The Triplestore() function is the main entry point for creating backend instances: 
@@ -158,7 +158,7 @@ Supported geometry types include:
 ## Minimal Example
 **Pick a backend & count triples**
 ```python
-from triplestore import Triplestore, available_backends
+from rdf_triplestore import Triplestore, available_backends
 
 print("Available backends:", available_backends())
 

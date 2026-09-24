@@ -54,7 +54,7 @@ pip install rdf-triplestore[geo]
 ## Usage
 
 ```python
-from triplestore import Triplestore
+from rdf_triplestore import Triplestore
 
 # Initialize with desired backend
 store = Triplestore(backend="jena", config={...})

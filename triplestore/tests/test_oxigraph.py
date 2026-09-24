@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 from rdflib import BNode, Graph, Literal, URIRef
 from rdflib.namespace import XSD
-from triplestore import Triplestore
+from rdf_triplestore import Triplestore
 
 # Sample data
 SUBJECT = "http://example.org/s"

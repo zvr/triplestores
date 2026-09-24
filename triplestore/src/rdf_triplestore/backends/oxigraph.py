@@ -11,8 +11,8 @@ from rdflib import BNode as RDFLibBNode
 from rdflib import Literal as RDFLibLiteral
 from rdflib import URIRef as RDFLibURIRef
 
-from triplestore.base import TriplestoreBackend
-from triplestore.utils import (
+from rdf_triplestore.base import TriplestoreBackend
+from rdf_triplestore.utils import (
     export_ask_result,
     export_rdf_result,
     export_select_results,

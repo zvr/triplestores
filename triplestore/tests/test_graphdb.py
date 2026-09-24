@@ -18,8 +18,8 @@ import pytest
 import requests
 from rdflib import BNode, Graph, Literal, URIRef
 from rdflib.namespace import XSD
-from triplestore import Triplestore
-from triplestore.utils import detect_graphdb_url
+from rdf_triplestore import Triplestore
+from rdf_triplestore.utils import detect_graphdb_url
 
 SUBJECT = "http://example.org/s"
 PREDICATE = "http://example.org/p"

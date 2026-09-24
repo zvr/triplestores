@@ -18,8 +18,8 @@ from pathlib import Path
 
 import pytest
 import requests
-from triplestore import Triplestore
-from triplestore.utils import detect_graphdb_url
+from rdf_triplestore import Triplestore
+from rdf_triplestore.utils import detect_graphdb_url
 
 BULK_SUBJECT = "http://example.org/bulk_s"
 BULK_PREDICATE = "http://example.org/bulk_p"

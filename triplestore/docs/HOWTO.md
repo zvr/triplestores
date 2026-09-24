@@ -48,7 +48,7 @@ The `load()` method imports RDF data from a file into the triplestore.
 - If a **named graph** is specified in the configuration, the data is loaded into that graph.
 - If no graph is specified, the data is loaded into the **default graph**.
 ```python
-from triplestore import Triplestore
+from rdf_triplestore import Triplestore
 
 store = Triplestore(backend, config)
 store.load(file)
@@ -60,7 +60,7 @@ The `add()` method inserts a triple into the triplestore.
 - If a **named graph** is specified in the configuration, the triple is added to that graph.
 - If no graph is specified, the triple is added to the **default graph**.
 ```python
-from triplestore import Triplestore
+from rdf_triplestore import Triplestore
 
 store = Triplestore(backend, config)
 
@@ -78,7 +78,7 @@ The `delete()` method removes a triple from the triplestore.
 - If no graph is specified, the triple is removed from the **default graph**.
 
 ```python
-from triplestore import Triplestore
+from rdf_triplestore import Triplestore
 
 store = Triplestore(backend, config)
 
@@ -94,7 +94,7 @@ The library provides two methods for running SPARQL queries:
 - query(): specifically designed for `SELECT` queries. It returns a list of dictionaries, where each dictionary represents one result binding.
 - execute(): a generic method for running any SPARQL query (e.g. `SELECT`, `ASK`, `CONSTRUCT`, `INSERT`, `DELETE`, `UPDATE`). Although `execute()` may also be used for SELECT, query() is the recommended convenience method.
 ```python
-from triplestore import Triplestore
+from rdf_triplestore import Triplestore
 
 store = Triplestore(backend, config)
 
@@ -119,7 +119,7 @@ store.execute(update)  # returns None
 WARNING: If you declared a graph in the configuration, clear() will clear only that named graph.
 Otherwise, it clears the default graph.
 ```python
-from triplestore import Triplestore
+from rdf_triplestore import Triplestore
 
 store = Triplestore(backend, config)
 
@@ -131,7 +131,7 @@ store.clear()
 ### Basic Usage
 A complete example showing the main operations:
 ```python
-from triplestore import Triplestore
+from rdf_triplestore import Triplestore
 
 store = Triplestore(backend="oxigraph", config={"graph": None})
 

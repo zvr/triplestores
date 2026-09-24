@@ -19,7 +19,7 @@ import pytest
 import requests
 from requests.auth import HTTPDigestAuth
 from shapely import wkt as shapely_wkt
-from triplestore import Triplestore
+from rdf_triplestore import Triplestore
 
 BASE_URL = "http://localhost:8890"
 

@@ -15,7 +15,7 @@
 
 
 from bench.benchmark import bench_report, benchmark
-from triplestore import Triplestore
+from rdf_triplestore import Triplestore
 
 # implementation
 

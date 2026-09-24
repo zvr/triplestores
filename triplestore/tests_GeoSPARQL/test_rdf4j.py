@@ -17,7 +17,7 @@ from pathlib import Path
 
 import pytest
 import requests
-from triplestore import Triplestore
+from rdf_triplestore import Triplestore
 
 BASE_URL = "http://localhost:8080/rdf4j-server"
 
