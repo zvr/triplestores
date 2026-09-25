@@ -1,0 +1,125 @@
+[project]
+name = "rdf-triplestore"
+version = "0.2.0"
+description = "A unified abstraction layer for interacting with multiple RDF triplestore backends"
+readme = "README.md"
+authors = [
+    { name = "Alexios Zavras (zvr)", email = "python@zvr.gr" },
+    { name = "Maira Papadopoulou", email = "mmpapadopoulouu@gmail.com" },
+]
+maintainers = [
+    { name = "Alexios Zavras (zvr)", email = "python@zvr.gr" },
+    { name = "Maira Papadopoulou", email = "mmpapadopoulouu@gmail.com" },
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+
+dependencies = ["rdflib"]
+
+[project.urls]
+homepage = "https://github.com/eellak/triplestore"
+source = "https://github.com/eellak/triplestore.git"
+github = "https://github.com/eellak/triplestore"
+issues = "https://github.com/eellak/triplestore/issues"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project.optional-dependencies]
+allegrograph = [
+    "agraph-python>=104.3.0",
+    "requests>=2.32.4",
+]
+
+blazegraph = ["requests>=2.32.4"]
+
+graphdb = ["requests>=2.32.4"]
+
+jena =[
+    "psutil>=7.0.0",
+    "requests>=2.32.4"
+]
+
+oxigraph = ["pyoxigraph>=0.4.11"]
+
+qlever = ["requests>=2.32.4"]
+
+rdf4j = ["requests>=2.32.4"]
+
+virtuoso = ["requests>=2.32.4"]
+
+geo = ["shapely>=2.1.2"]
+
+all = [
+    "agraph-python>=104.3.0",
+    "psutil>=7.0.0",
+    "pyoxigraph>=0.4.11",
+    "requests>=2.32.4",
+    "shapely>=2.1.2",
+]
+
+dev = [
+    "pytest",
+    "ruff",
+    "mypy",
+    "build"
+]
+
+[project.entry-points."rdf_triplestore.backends"]
+allegrograph = "rdf_triplestore.backends.allegrograph:AllegroGraph"
+blazegraph   = "rdf_triplestore.backends.blazegraph:Blazegraph"
+graphdb      = "rdf_triplestore.backends.graphdb:GraphDB"
+jena         = "rdf_triplestore.backends.jena:Jena"
+oxigraph     = "rdf_triplestore.backends.oxigraph:Oxigraph"
+qlever       = "rdf_triplestore.backends.qlever:QLever"
+rdf4j        = "rdf_triplestore.backends.rdf4j:RDF4J"
+virtuoso     = "rdf_triplestore.backends.virtuoso:Virtuoso"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+
+[tool.ruff]
+fix = false
+indent-width = 4
+line-length = 150
+# output-format = "full"
+output-format = "grouped"
+preview = true
+required-version = ">=0.9"
+show-fixes = true
+
+[tool.ruff.format]
+docstring-code-format = false
+indent-style = "space"
+line-ending = "native"
+preview = true
+quote-style = "double"
+skip-magic-trailing-comma = false
+
+[tool.ruff.lint]
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+fixable = ["ALL"]
+ignore = [ "AIR", "ANN", "D", "NPY", "PD", "COM812", "RUF012" ]
+preview = true
+select = [ "ALL" ]
+unfixable = []
+
+[tool.ruff.lint.per-file-ignores]
+"bench/*.py" = [ "PLR2004", "PLW0603", "T201" ]
+"bench/benchmark.py" = [ "INP001", "S311", "T201" ]
+"demo/*.py" = [ "INP001", "T201" ]
+"tests/*.py" = [ "INP001", "PLR2004", "S101" ]
+
+[tool.ruff.lint.isort]
+case-sensitive = true
+force-sort-within-sections = false
+from-first = false
+lines-between-types = 0
+split-on-trailing-comma = false
+
